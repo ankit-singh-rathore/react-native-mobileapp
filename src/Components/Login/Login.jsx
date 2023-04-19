@@ -9,17 +9,42 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as LocalAuthentication from "expo-local-authentication";
-import { 
+import {
   hasHardwareAsync,
   isEnrolledAsync,
-  authenticateAsync 
-} from 'expo-local-authentication';
+  authenticateAsync,
+} from "expo-local-authentication";
+
+import * as Location from "expo-location";
 
 function Login(props) {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  /*MAPP - Enable sharing your loc*/
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
+
+  let MapCoordinates = "Waiting..";
+  if (errorMsg) {
+    MapCoordinates = errorMsg;
+  } else if (location) {
+    MapCoordinates = JSON.stringify(location);
+  }
+  /*END map */
 
   function handleEmail(value) {
     setEmail(value);
@@ -35,14 +60,16 @@ function Login(props) {
   }
 
   const biometricsAuth = async () => {
-    const compatible = await hasHardwareAsync()
-    if (!compatible) throw 'This device is not compatible for biometric authentication'
-    const enrolled = await isEnrolledAsync()
-    if (!enrolled) throw 'This device dont have biometric authentication enabled'
-    const result = await authenticateAsync()
-    if (!result.success) throw `${result.error} - Authentication unsuccessful`
-    return
-}
+    const compatible = await hasHardwareAsync();
+    if (!compatible)
+      throw "This device is not compatible for biometric authentication";
+    const enrolled = await isEnrolledAsync();
+    if (!enrolled)
+      throw "This device dont have biometric authentication enabled";
+    const result = await authenticateAsync();
+    if (!result.success) throw `${result.error} - Authentication unsuccessful`;
+    return;
+  };
 
   const storeDataAndNavigate = async (value) => {
     try {
@@ -59,6 +86,7 @@ function Login(props) {
 
   return (
     <SafeAreaView>
+      <Text>{MapCoordinates}</Text>
       <View>
         <TextInput
           style={styles.input}
