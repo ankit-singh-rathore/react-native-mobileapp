@@ -1,36 +1,20 @@
-import React, { useState, useEffect} from 'react'
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Login from '../Login/Login';
+import CakesList from "../CakesComp/CakesList";
+import Cart from '../Cart/Cart';
+
+const Tab = createBottomTabNavigator();
 
 function Home() {
-    const [time, setTime] = useState(new Date().toLocaleString());   /* toLocaleTimeString  - for time ONLY */
-
-    useEffect(() => {
-        const time = () => {
-            const event = new Date();
-            setTime(event.toLocaleString())
-        }
-        const intervalId = setInterval(time, 1000);
-      return () => {
-        clearInterval(intervalId);
-      }
-    }, [])
     
   return (
-    <View style={style.container} >
-        <Text>{time}</Text>
-        <Login />
-    </View>
-  )
+    <Tab.Navigator>
+      <Tab.Screen name="Login" component={Login} />
+      <Tab.Screen name="CakesList" component={CakesList} />
+      <Tab.Screen name="Cart" component={Cart} />
+    </Tab.Navigator>
+  );
 }
-
-const style = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#fff",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-})
 
 export default Home

@@ -1,8 +1,11 @@
-import React from "react";
+import React , {useState, useEffect} from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 function Cakes(props) {
+
+  const [time, setTime] = useState(new Date().toLocaleString());   /* toLocaleTimeString  - for time ONLY */
+
   const navigation = useNavigation();
   const data = props.data;
   function handleImagepress() {
@@ -10,8 +13,20 @@ function Cakes(props) {
       cakeid: data.cakeid,
     });
   }
+    useEffect(() => {
+        const time = () => {
+            const event = new Date();
+            setTime(event.toLocaleString())
+        }
+        const intervalId = setInterval(time, 1000);
+      return () => {
+        clearInterval(intervalId);
+      }
+    }, [])
+
   return (
     <View style={styles.container}>
+      <Text>{time}</Text>
       {data.image && (
         <View>
           <View style={styles.card_template}>
